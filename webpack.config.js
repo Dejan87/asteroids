@@ -5,7 +5,7 @@ module.exports = {
         app: "./js/app.js",
     },
     output: {
-        path: path.resolve(__dirname, "./js/scripts"),
+        path: path.resolve(__dirname, "./js/app"),
         filename: "[name].js" // [name] will keep the file name dynamic
     },
     module: {

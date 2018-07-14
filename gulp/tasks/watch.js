@@ -18,9 +18,9 @@ gulp.task("watch", function(){
 		gulp.start("cssInject");
 	});
 
-	//watch("./js/scripts/**/*.js", function() {
-		//gulp.start("scriptsRefresh");
-	//});
+	watch("./js/**/*.js", function() {
+		gulp.start("scriptsRefresh");
+	});
 });
 
 gulp.task("cssInject", ["styles"] , function(){
