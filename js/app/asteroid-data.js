@@ -101,7 +101,7 @@ var AsteroidsData = function () {
         this.asteroidArray = JSON.parse(localStorage.getItem("hazardousAsteroids"));
         // Retrieve the selected asteroid from the local storage
         this.selectedAsteroid = localStorage.getItem("asteroid");
-        console.log(this.asteroidArray, this.selectedAsteroid);
+        
         for (var i = 0; i < this.asteroidArray.length; i++) {
             // Find the selected asteroid
             if (this.asteroidArray[i].name === this.selectedAsteroid) {
