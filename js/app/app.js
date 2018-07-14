@@ -60,36 +60,11 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 0);
+/******/ 	return __webpack_require__(__webpack_require__.s = 1);
 /******/ })
 /************************************************************************/
 /******/ ([
 /* 0 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-var _DatePicker = __webpack_require__(1);
-
-var _DatePicker2 = _interopRequireDefault(_DatePicker);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-var showAsteroids = new _DatePicker2.default().showAsteroids; /*import MobileMenu from "./modules/MobileMenu";
-                                                              import RevealOnScroll from "./modules/RevealOnScroll";
-                                                              import $ from "jquery";
-                                                              import StickyHeader from "./modules/StickyHeader";
-                                                              import Modal from "./modules/Modal";
-                                                              
-                                                              var mobileMenu = new MobileMenu();
-                                                              new RevealOnScroll($(".feature-item"), "85%");
-                                                              new RevealOnScroll($(".testimonial"), "60%");
-                                                              var stickyHeader = new StickyHeader();
-                                                              var modal = new Modal;*/
-
-/***/ }),
-/* 1 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -100,6 +75,176 @@ Object.defineProperty(exports, "__esModule", {
 });
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var AsteroidsTable = function () {
+    function AsteroidsTable() {
+        _classCallCheck(this, AsteroidsTable);
+    }
+
+    _createClass(AsteroidsTable, [{
+        key: "fetchAsteroidsData",
+        value: function fetchAsteroidsData(start_date, end_date) {
+            var xhr = new XMLHttpRequest();
+            xhr.open('GET', "https://api.nasa.gov/neo/rest/v1/feed?start_date=" + start_date + "&end_date=" + end_date + "&api_key=x0HeIJzRCLm3lj0zrfXt2LltusKVCO7aoHmRkVq2");
+
+            xhr.send(null);
+
+            var self = this;
+
+            xhr.onreadystatechange = function () {
+                var DONE = 4;
+                var OK = 200;
+                if (xhr.readyState === DONE) {
+                    if (xhr.status === OK) {
+                        var res = JSON.parse(xhr.responseText);
+                        var days = Object.keys(res.near_earth_objects); // Collect all the keys/days, so you can access all asteroids by day
+
+                        var hazardousAsteroids = self.fetchHazardousAsteroids.call(self, res, days); // Store only hazardous asteroids
+
+                        // Save the resulting array to local storage for future use
+                        localStorage.setItem("hazardousAsteroids", JSON.stringify(hazardousAsteroids));
+
+                        self.createTable.call(self, hazardousAsteroids);
+                        self.createAsteroidsList.call(self, hazardousAsteroids);
+                    } else {
+                        console.log('Error: ' + xhr.status); // An error occurred during the request.
+                    }
+                }
+            };
+        }
+    }, {
+        key: "fetchHazardousAsteroids",
+        value: function fetchHazardousAsteroids(response, days) {
+            var results = []; // Store all hazardous asteroids here
+
+            for (var i = 0; i < days.length; i++) {
+
+                var asteroidsOnEachDay = response.near_earth_objects[days[i]]; // Check all asteroids on a given day
+
+                for (var j = 0; j < asteroidsOnEachDay.length; j++) {
+                    // Look for a asteroid that is hazardous
+                    if (asteroidsOnEachDay[j].is_potentially_hazardous_asteroid === true) {
+                        results.push(asteroidsOnEachDay[j]); // Add hazardous asteroid to a resulting array
+                    }
+                }
+            }
+
+            return results;
+        }
+    }, {
+        key: "createTable",
+        value: function createTable(array) {
+            var tableBody = document.getElementById("table-body");
+
+            // Before creating a table make sure to clear existing data, if any
+            tableBody.innerHTML = "";
+
+            // Create a new row for each hazardous asteroid
+            for (var i = 0; i < array.length; i++) {
+
+                var tr = document.createElement("tr"); // Create table row
+
+                // Create all table cells and append them to table row, five in total
+                var date = document.createElement("td");
+                var dateText = document.createTextNode(array[i].close_approach_data["0"].close_approach_date);
+                date.appendChild(dateText);
+                tr.appendChild(date);
+
+                var name = document.createElement("td");
+                var nameText = document.createTextNode(array[i].name);
+                name.appendChild(nameText);
+                tr.appendChild(name);
+
+                var speed = document.createElement("td");
+                var speedText = document.createTextNode(array[i].close_approach_data["0"].relative_velocity.kilometers_per_hour);
+                speed.appendChild(speedText);
+                tr.appendChild(speed);
+
+                var min = document.createElement("td");
+                var minText = document.createTextNode(array[i].estimated_diameter.meters.estimated_diameter_min);
+                min.appendChild(minText);
+                tr.appendChild(min);
+
+                var max = document.createElement("td");
+                var maxText = document.createTextNode(array[i].estimated_diameter.meters.estimated_diameter_min);
+                max.appendChild(maxText);
+                tr.appendChild(max);
+
+                // Append the whole row to the table
+                tableBody.appendChild(tr);
+
+                // Show the preview
+                var asteroidSection = document.getElementById("asteroids-preview");
+                asteroidSection.style.display = "block";
+
+                // Clear the input field, if there is any data from previous search
+                document.getElementById("asteroidList").value = "";
+            }
+        }
+    }, {
+        key: "createAsteroidsList",
+        value: function createAsteroidsList(array) {
+            var dropdown = document.getElementById("asteroids");
+
+            // Before creating a dropdown make sure to clear existing data, if any
+            dropdown.innerHTML = "";
+
+            for (var i = 0; i < array.length; i++) {
+
+                var option = document.createElement("option"); // Create the option tag
+
+                option.setAttribute("value", array[i].name); // Set the value
+
+                // Append all the options to the dropdown
+                dropdown.appendChild(option);
+            }
+        }
+    }]);
+
+    return AsteroidsTable;
+}();
+
+exports.default = AsteroidsTable;
+
+/***/ }),
+/* 1 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var _DatePicker = __webpack_require__(2);
+
+var _DatePicker2 = _interopRequireDefault(_DatePicker);
+
+var _AsteroidsTable = __webpack_require__(0);
+
+var _AsteroidsTable2 = _interopRequireDefault(_AsteroidsTable);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+new _DatePicker2.default();
+
+/***/ }),
+/* 2 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _AsteroidsTable = __webpack_require__(0);
+
+var _AsteroidsTable2 = _interopRequireDefault(_AsteroidsTable);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -136,8 +281,8 @@ var DatePicker = function () {
                     // Clear existing alert message
                     this.message.innerHTML = "";
 
-                    // Show asteroids
-                    //fetchAsteroidsData(start_date, end_date);
+                    // Fetch and show asteroids
+                    _AsteroidsTable2.default.prototype.fetchAsteroidsData(this.start_date.value, this.end_date.value);
                 } else {
                     message.innerHTML = "";
                     message.innerHTML = "<p>Date difference must be between 0 and 7</p>";

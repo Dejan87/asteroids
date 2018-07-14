@@ -103,7 +103,8 @@ header {
   padding: 40px 20px;
   border-radius: 20px;
   background-color: rgba(0, 0, 0, 0.6);
-  color: #fff; }
+  color: #fff;
+  display: none; }
   @media screen and (max-width: 925px) {
     .asteroids {
       width: 95%; } }
