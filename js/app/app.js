@@ -81,6 +81,13 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 var AsteroidsTable = function () {
     function AsteroidsTable() {
         _classCallCheck(this, AsteroidsTable);
+
+        this.asteroid = document.getElementById("asteroidList");
+        this.asteroidsMessage = document.getElementById("asteroidsMessage");
+
+        document.getElementById("closeApproaches").onclick = this.closeApproaches.bind(this);
+
+        this.previousSearch(); // If there is data in local storage, use it
     }
 
     _createClass(AsteroidsTable, [{
@@ -91,7 +98,7 @@ var AsteroidsTable = function () {
 
             xhr.send(null);
 
-            var self = this;
+            var self = this; // Save a reference of "this" keyword for future use
 
             xhr.onreadystatechange = function () {
                 var DONE = 4;
@@ -201,6 +208,40 @@ var AsteroidsTable = function () {
                 dropdown.appendChild(option);
             }
         }
+    }, {
+        key: "closeApproaches",
+        value: function closeApproaches() {
+            var asteroid = this.asteroid.value;
+
+            if (asteroid) {
+                localStorage.setItem("asteroid", asteroid); // Save the selected asteroid to local storage for future use
+
+                this.asteroidsMessage.innerHTML = ""; // Clear existing data, if any
+
+                window.location = "asteroids-data.html"; // Open new window
+            } else {
+                this.asteroidsMessage.innerHTML = ""; // Clear existing data, if any
+
+                this.asteroidsMessage.innerHTML = "<p>Please choose one of the asteroids from the list.</p>";
+            }
+        }
+
+        /**
+         * If there is data in local storage, show that data to the user (on index page)
+         * When user visits the chart page, he/she can see previous search results after returning to index
+         */
+
+    }, {
+        key: "previousSearch",
+        value: function previousSearch() {
+            var previousSearch = localStorage.getItem("hazardousAsteroids");
+
+            if (previousSearch) {
+                previousSearch = JSON.parse(localStorage.getItem("hazardousAsteroids"));
+                this.createTable.call(this, previousSearch); // Show previous search results
+                this.createAsteroidsList.call(this, previousSearch); // Populate dropdown
+            }
+        }
     }]);
 
     return AsteroidsTable;
@@ -226,6 +267,7 @@ var _AsteroidsTable2 = _interopRequireDefault(_AsteroidsTable);
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 new _DatePicker2.default();
+new _AsteroidsTable2.default();
 
 /***/ }),
 /* 2 */

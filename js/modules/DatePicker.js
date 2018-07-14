@@ -29,6 +29,7 @@ class DatePicker {
                 
                 // Fetch and show asteroids
                 AsteroidsTable.prototype.fetchAsteroidsData(this.start_date.value, this.end_date.value);
+
             } else {
                 message.innerHTML = "";
                 message.innerHTML = "<p>Date difference must be between 0 and 7</p>";
