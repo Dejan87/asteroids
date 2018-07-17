@@ -57,14 +57,26 @@
             </table>
         </div>
         <div class="astroids__list">
-            <p>Select one of the asteroids from the table:</p>
-            <input type="text" list="asteroids" id="asteroidList">
-            <datalist id="asteroids">
-                
-            </datalist><br>
-            <div class="button button--left-position" id="closeApproaches">Show the number of close approaches to earth</div>
-            <div class="asteroids__message" id="asteroidsMessage">
+            <div class="row">
+                <div class="col-md-7">
+                    <p>Select one of the asteroids from the table<br> and press enter to add that asteroid to the list:</p>
+                    <input type="text" list="asteroids" id="asteroidList">
+                    <datalist id="asteroids">
+                        
+                    </datalist><br>
+                    <div class="asteroids__message" id="inputMessage">
 
+                    </div>
+                </div>
+                <div class="col-md-5">
+                    <div id="selectedAsteroids" class="asteroids__list-preview">
+                        
+                    </div>
+                    <div class="button button--left-position" id="closeApproaches">Close approaches</div>
+                    <div class="asteroids__message" id="asteroidsMessage">
+
+                    </div>
+                </div>
             </div>
         </div>
     </section>

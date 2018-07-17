@@ -1,11 +1,87 @@
 class AsteroidsTable {
     constructor() {
         this.asteroid = document.getElementById("asteroidList");
+        this.selectedAsteroids = document.getElementById("selectedAsteroids");
         this.asteroidsMessage = document.getElementById("asteroidsMessage");
+        this.inputMessage = document.getElementById("inputMessage");
+        this.asteroidArray = [];
 
         document.getElementById("closeApproaches").onclick = this.closeApproaches.bind(this);
+        document.getElementById("asteroidList").onchange = this.addAsteroidToTheList.bind(this);
 
         this.previousSearch(); // If there is data in local storage, use it
+    }
+
+    addAsteroidToTheList() {
+        let asteroid = this.asteroid.value;
+
+        // Check if asteroid is already selected, already exist in the list
+        let check = this.checkValidity.call(this, asteroid);
+        
+        if(asteroid) {
+
+            // Check if asteroid is already selected, already exist in the list
+            if( check ) {
+                this.asteroidArray.push(asteroid); // Add selected asteroid to the array
+                
+                // Create div element and set his id (name of the asteroid)
+                let div = document.createElement("div");
+                div.setAttribute("id", this.asteroid.value);
+
+                //Create the first span, set the class to "name" and text to asteroid name. Append to the div element
+                let firstSpan = document.createElement("span");
+                firstSpan.setAttribute("class", "name");
+                let text = document.createTextNode(this.asteroid.value);
+                firstSpan.appendChild(text);
+                div.appendChild(firstSpan);
+
+                // Create the second span, set the class to delete and text to "x". Append to the div element
+                let secondSpan = document.createElement("span");
+                secondSpan.setAttribute("class", "delete");
+                let text2 = document.createTextNode("x");
+                secondSpan.appendChild(text2);
+                div.appendChild(secondSpan);
+
+                // Append the div element to the selectedAsteroids list
+                this.selectedAsteroids.appendChild(div);
+
+                this.asteroid.value = ""; // Clear the field
+
+                localStorage.setItem("asteroid", JSON.stringify(this.asteroidArray)); // Save the array to the local storage for future use
+
+                this.inputMessage.innerHTML = ""; // Clear existing data, if any
+
+            } else {
+                this.inputMessage.innerHTML = ""; // Clear existing data, if any
+
+                this.inputMessage.innerHTML = "<p>Selected asteroid is already in the list, or you have entered asteroid name that does not exist.</p>";
+            }         
+        } else {
+            this.inputMessage.innerHTML = ""; // Clear existing data, if any
+
+            this.inputMessage.innerHTML = "<p>Please select one of the asteroids.</p>";
+        }
+    }
+
+    checkValidity(selectedAsteroid) {
+        // Check if asteroid is already in the list
+        let position = this.asteroidArray.indexOf(selectedAsteroid);
+        
+        // Check if the entered value is one of the asteroids in the table
+        let tableOfAsteroids = JSON.parse(localStorage.getItem("hazardousAsteroids"));
+
+        let arrayOfNames = [];
+        for(let i = 0; i < tableOfAsteroids.length; i++) {
+            arrayOfNames.push(tableOfAsteroids[i].name);
+        }
+
+        let checkName = arrayOfNames.indexOf(selectedAsteroid);
+        
+        if(position === -1 && checkName > -1) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     fetchAsteroidsData(start_date, end_date) {
@@ -92,7 +168,7 @@ class AsteroidsTable {
             tr.appendChild(min);
 
             let max = document.createElement("td");
-            let maxText = document.createTextNode(array[i].estimated_diameter.meters.estimated_diameter_min);
+            let maxText = document.createTextNode(array[i].estimated_diameter.meters.estimated_diameter_max);
             max.appendChild(maxText);
             tr.appendChild(max);
 
