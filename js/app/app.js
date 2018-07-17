@@ -86,7 +86,10 @@ var AsteroidsTable = function () {
         this.selectedAsteroids = document.getElementById("selectedAsteroids");
         this.asteroidsMessage = document.getElementById("asteroidsMessage");
         this.inputMessage = document.getElementById("inputMessage");
+
+        // Create empty array in the localStorage, use it to store selected asteroids
         this.asteroidArray = [];
+        localStorage.setItem("asteroids", JSON.stringify(this.asteroidArray));
 
         document.getElementById("closeApproaches").onclick = this.closeApproaches.bind(this);
         document.getElementById("asteroidList").onchange = this.addAsteroidToTheList.bind(this);
@@ -106,7 +109,8 @@ var AsteroidsTable = function () {
 
                 // Check if asteroid is already selected, already exist in the list
                 if (check) {
-                    this.asteroidArray.push(asteroid); // Add selected asteroid to the array
+                    var asteroidArray = JSON.parse(localStorage.getItem("asteroids"));
+                    asteroidArray.push(asteroid); // Add selected asteroid to the array
 
                     // Create div element and set his id (name of the asteroid)
                     var div = document.createElement("div");
@@ -129,13 +133,20 @@ var AsteroidsTable = function () {
                     // Append the div element to the selectedAsteroids list
                     this.selectedAsteroids.appendChild(div);
 
+                    // Add eventListener to all elements with the class name delete
+                    var elements = document.getElementsByClassName("delete");
+                    for (var i = 0; i < elements.length; i++) {
+                        elements[i].addEventListener("click", this.deleteAsteroid);
+                    }
+
                     this.asteroid.value = ""; // Clear the field
 
-                    localStorage.setItem("asteroid", JSON.stringify(this.asteroidArray)); // Save the array to the local storage for future use
+                    localStorage.setItem("asteroids", JSON.stringify(asteroidArray)); // Save the array to the local storage for future use
 
                     this.inputMessage.innerHTML = ""; // Clear existing data, if any
                 } else {
                     this.inputMessage.innerHTML = ""; // Clear existing data, if any
+                    this.asteroid.value = ""; // Clear the field
 
                     this.inputMessage.innerHTML = "<p>Selected asteroid is already in the list, or you have entered asteroid name that does not exist.</p>";
                 }
@@ -146,10 +157,72 @@ var AsteroidsTable = function () {
             }
         }
     }, {
+        key: "deleteAsteroid",
+        value: function deleteAsteroid() {
+            // Get the id of the element that user wants to delete from the list, id is equal to asteroid name
+            var id = this.parentNode.getAttribute("id");
+
+            // Find the index of that asteroid in the asteroidArray
+            var asteroidArray = JSON.parse(localStorage.getItem("asteroids"));
+            var index = asteroidArray.indexOf(id);
+
+            // Remove that element/asteroid from the array/list
+            asteroidArray.splice(index, 1);
+
+            // Update the array in the localStorage after deleting
+            localStorage.setItem("asteroids", JSON.stringify(asteroidArray));
+
+            // Update user's list
+            AsteroidsTable.prototype.updateUserList();
+        }
+    }, {
+        key: "updateUserList",
+        value: function updateUserList() {
+            // Get the asteroid array from localStorage
+            var asteroidArray = JSON.parse(localStorage.getItem("asteroids"));
+            var selected = document.getElementById("selectedAsteroids");
+
+            // First, clear the existing list
+            selected.innerHTML = "";
+
+            // Display updated elements to the list
+            for (var i = 0; i < asteroidArray.length; i++) {
+                // Create div element and set his id (name of the asteroid)
+                var div = document.createElement("div");
+                div.setAttribute("id", asteroidArray[i]);
+
+                //Create the first span, set the class to "name" and text to asteroid name. Append to the div element
+                var firstSpan = document.createElement("span");
+                firstSpan.setAttribute("class", "name");
+                var text = document.createTextNode(asteroidArray[i]);
+                firstSpan.appendChild(text);
+                div.appendChild(firstSpan);
+
+                // Create the second span, set the class to delete and text to "x". Append to the div element
+                var secondSpan = document.createElement("span");
+                secondSpan.setAttribute("class", "delete");
+                var text2 = document.createTextNode("x");
+                secondSpan.appendChild(text2);
+                div.appendChild(secondSpan);
+
+                // Append the div element to the selectedAsteroids list
+                selected.appendChild(div);
+            }
+
+            // Add eventListener to all elements with the class name delete
+            var elements = document.getElementsByClassName("delete");
+            for (var j = 0; j < elements.length; j++) {
+                elements[j].addEventListener("click", this.deleteAsteroid);
+            }
+        }
+    }, {
         key: "checkValidity",
         value: function checkValidity(selectedAsteroid) {
+            // Retrieve the array from local storage
+            var asteroidArray = JSON.parse(localStorage.getItem("asteroids"));
+
             // Check if asteroid is already in the list
-            var position = this.asteroidArray.indexOf(selectedAsteroid);
+            var position = asteroidArray.indexOf(selectedAsteroid);
 
             // Check if the entered value is one of the asteroids in the table
             var tableOfAsteroids = JSON.parse(localStorage.getItem("hazardousAsteroids"));
