@@ -87,12 +87,6 @@ var AsteroidsTable = function () {
         this.asteroidsMessage = document.getElementById("asteroidsMessage");
         this.inputMessage = document.getElementById("inputMessage");
 
-        // Pagination variables
-        this.currentPage = 0;
-        this.pageSize = 10;
-        this.currentPageItems = [];
-        this.previousPageItems = [];
-
         // Create empty array in the localStorage, use it to store selected asteroids
         this.asteroidArray = [];
         localStorage.setItem("asteroids", JSON.stringify(this.asteroidArray));
@@ -101,14 +95,18 @@ var AsteroidsTable = function () {
         document.getElementById("asteroidList").onchange = this.addAsteroidToTheList.bind(this);
 
         // Pagination references
-        this.next = document.getElementById("nextPageButton");
-        this.prev = document.getElementById("previousPageButton");
-        this.next.onclick = this.navigateToNextPage.bind(this);
-        this.prev.onclick = this.navigateToPrevoiusPage.bind(this);
+        document.getElementById("nextPageButton").onclick = this.navigateToNextPage.bind(this);
+        document.getElementById("previousPageButton").onclick = this.navigateToPrevoiusPage.bind(this);
 
         // Sorting references
         document.getElementById("thSpeed").onclick = this.sortBySpeed.bind(this);
         document.getElementById("thName").onclick = this.sortByName.bind(this);
+
+        // Pagination variables
+        this.currentPage = 0;
+        this.pageSize = 10;
+        this.currentPageItems = [];
+        this.previousPageItems = [];
 
         this.previousSearch(); // If there is data in local storage, use it
     }
@@ -419,15 +417,19 @@ var AsteroidsTable = function () {
         key: "initializeTable",
         value: function initializeTable() {
             var asteroids = JSON.parse(localStorage.getItem("hazardousAsteroids"));
-            if (asteroids.length > this.pageSize) {
-                this.currentPageItems = asteroids.slice(0, this.pageSize);
-                document.getElementById('nextPageButton').disabled = false;
-                document.getElementById('previousPageButton').disabled = true;
-            } else {
-                this.currentPageItems = asteroids;
-                document.getElementById('nextPageButton').disabled = true;
-                document.getElementById('previousPageButton').disabled = true;
-            }
+            this.currentPageItems = asteroids.slice(0, 10);
+
+            /*console.log(this);
+                if (asteroids.length > 10) {
+                    this.currentPageItems = asteroids.slice(0, 10);
+                console.log(this.currentPageItems);
+                    document.getElementById('nextPageButton').disabled = false;
+                    document.getElementById('previousPageButton').disabled = true;
+                } else {
+                    this.currentPageItems = asteroids;
+                    document.getElementById('nextPageButton').disabled = true;
+                    document.getElementById('previousPageButton').disabled = true;
+                }*/
 
             this.fillCurrentPageItems.call(this);
         }
@@ -486,6 +488,10 @@ var AsteroidsTable = function () {
             var asteroids = JSON.parse(localStorage.getItem("hazardousAsteroids"));
             var numberOfElementsToPlaceInNextPage = asteroids.length > this.currentPage * this.pageSize + this.pageSize ? this.pageSize : asteroids.length - this.currentPage * this.pageSize;
 
+            if (this.currentPageItems.length === 0) {
+                this.currentPageItems = asteroids;
+            }
+
             if (this.currentPageItems) {
                 this.previousPageItems = this.currentPageItems;
             }
@@ -509,12 +515,13 @@ var AsteroidsTable = function () {
         key: "navigateToPrevoiusPage",
         value: function navigateToPrevoiusPage() {
             var asteroids = JSON.parse(localStorage.getItem("hazardousAsteroids"));
+
             this.currentPageItems = this.previousPageItems;
             this.fillCurrentPageItems.call(this);
             document.getElementById('nextPageButton').disabled = false;
             this.currentPage--;
 
-            if (this.currentPage == 0) {
+            if (this.currentPage === 0) {
                 document.getElementById('previousPageButton').disabled = true;
                 this.previousPageItems = [];
             } else {

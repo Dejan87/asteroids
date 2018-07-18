@@ -5,12 +5,6 @@ class AsteroidsTable {
         this.asteroidsMessage = document.getElementById("asteroidsMessage");
         this.inputMessage = document.getElementById("inputMessage");
 
-        // Pagination variables
-        this.currentPage = 0;
-        this.pageSize = 10;
-        this.currentPageItems = [];
-        this.previousPageItems = [];
-
         // Create empty array in the localStorage, use it to store selected asteroids
         this.asteroidArray = [];
         localStorage.setItem("asteroids", JSON.stringify(this.asteroidArray));
@@ -19,14 +13,18 @@ class AsteroidsTable {
         document.getElementById("asteroidList").onchange = this.addAsteroidToTheList.bind(this);
 
         // Pagination references
-        this.next = document.getElementById("nextPageButton");
-        this.prev = document.getElementById("previousPageButton");
-        this.next.onclick = this.navigateToNextPage.bind(this);
-        this.prev.onclick = this.navigateToPrevoiusPage.bind(this);
+        document.getElementById("nextPageButton").onclick = this.navigateToNextPage.bind(this);
+        document.getElementById("previousPageButton").onclick = this.navigateToPrevoiusPage.bind(this);
 
         // Sorting references
         document.getElementById("thSpeed").onclick = this.sortBySpeed.bind(this);
         document.getElementById("thName").onclick = this.sortByName.bind(this);
+
+        // Pagination variables
+        this.currentPage = 0;
+        this.pageSize = 10;
+        this.currentPageItems = [];
+        this.previousPageItems = [];
 
         this.previousSearch(); // If there is data in local storage, use it
     }
@@ -327,15 +325,19 @@ class AsteroidsTable {
      *****************************************/
     initializeTable() {
         let asteroids = JSON.parse(localStorage.getItem("hazardousAsteroids"));
-        if (asteroids.length > this.pageSize) {
-            this.currentPageItems = asteroids.slice(0, this.pageSize);
+        this.currentPageItems = asteroids.slice(0, 10);
+        
+    /*console.log(this);
+        if (asteroids.length > 10) {
+            this.currentPageItems = asteroids.slice(0, 10);
+        console.log(this.currentPageItems);
             document.getElementById('nextPageButton').disabled = false;
             document.getElementById('previousPageButton').disabled = true;
         } else {
             this.currentPageItems = asteroids;
             document.getElementById('nextPageButton').disabled = true;
             document.getElementById('previousPageButton').disabled = true;
-        }
+        }*/
     
         this.fillCurrentPageItems.call(this);
     }
@@ -343,10 +345,10 @@ class AsteroidsTable {
     fillCurrentPageItems() {
         let tableBody = document.getElementById('table-body');
         this.clearTable.call(this);
-
+    
         // Create a new row for each hazardous asteroid
         for(let i = 0; i < this.currentPageItems.length; i++) {
-
+            
             let tr = document.createElement("tr"); // Create table row
 
             // Create all table cells and append them to table row, five in total
@@ -378,6 +380,7 @@ class AsteroidsTable {
             // Append the whole row to the table
             tableBody.appendChild(tr);
         }
+        
     }
 
     clearTable() {
@@ -390,13 +393,17 @@ class AsteroidsTable {
     navigateToNextPage() {
         let asteroids = JSON.parse(localStorage.getItem("hazardousAsteroids"));
         let numberOfElementsToPlaceInNextPage = ((asteroids.length > this.currentPage * this.pageSize + this.pageSize) ? this.pageSize : asteroids.length - this.currentPage * this.pageSize);
-        
+
+        if(this.currentPageItems.length === 0) {
+            this.currentPageItems = asteroids;
+        }
+
         if (this.currentPageItems) {
             this.previousPageItems = this.currentPageItems;
         }
         this.currentPage++;
         this.currentPageItems = asteroids.slice(this.currentPage * this.pageSize, this.currentPage * this.pageSize + numberOfElementsToPlaceInNextPage);
-    
+
         if (asteroids.indexOf(this.currentPageItems[this.currentPageItems.length-1]) == asteroids.length-1) {
             document.getElementById('nextPageButton').disabled = true;       
         }
@@ -414,12 +421,13 @@ class AsteroidsTable {
 
     navigateToPrevoiusPage() {
         let asteroids = JSON.parse(localStorage.getItem("hazardousAsteroids"));
+
         this.currentPageItems = this.previousPageItems;
         this.fillCurrentPageItems.call(this);
         document.getElementById('nextPageButton').disabled = false;
         this.currentPage--;
     
-        if (this.currentPage == 0) {        
+        if (this.currentPage === 0) {        
             document.getElementById('previousPageButton').disabled = true;
             this.previousPageItems = [];
         } else {
