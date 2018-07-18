@@ -87,12 +87,24 @@ var AsteroidsTable = function () {
         this.asteroidsMessage = document.getElementById("asteroidsMessage");
         this.inputMessage = document.getElementById("inputMessage");
 
+        // Pagination variables
+        this.currentPage = 0;
+        this.pageSize = 10;
+        this.currentPageItems = [];
+        this.previousPageItems = [];
+
         // Create empty array in the localStorage, use it to store selected asteroids
         this.asteroidArray = [];
         localStorage.setItem("asteroids", JSON.stringify(this.asteroidArray));
 
         document.getElementById("closeApproaches").onclick = this.closeApproaches.bind(this);
         document.getElementById("asteroidList").onchange = this.addAsteroidToTheList.bind(this);
+
+        // Pagination references
+        this.next = document.getElementById("nextPageButton");
+        this.prev = document.getElementById("previousPageButton");
+        this.next.onclick = this.navigateToNextPage.bind(this);
+        this.prev.onclick = this.navigateToPrevoiusPage.bind(this);
 
         this.previousSearch(); // If there is data in local storage, use it
     }
@@ -339,6 +351,15 @@ var AsteroidsTable = function () {
                 // Clear the input field, if there is any data from previous search
                 document.getElementById("asteroidList").value = "";
             }
+
+            if (array.length > 10) {
+                this.initializeTable.call(this);
+                document.getElementById('nextPageButton').disabled = false;
+                document.getElementById('previousPageButton').disabled = false;
+            } else {
+                document.getElementById('nextPageButton').disabled = true;
+                document.getElementById('previousPageButton').disabled = true;
+            }
         }
     }, {
         key: "createAsteroidsList",
@@ -379,6 +400,111 @@ var AsteroidsTable = function () {
                 previousSearch = JSON.parse(localStorage.getItem("hazardousAsteroids"));
                 this.createTable.call(this, previousSearch); // Show previous search results
                 this.createAsteroidsList.call(this, previousSearch); // Populate dropdown
+            }
+        }
+
+        /******************************************
+         *         PAGINATION LOGIC
+         *****************************************/
+
+    }, {
+        key: "initializeTable",
+        value: function initializeTable() {
+            var asteroids = JSON.parse(localStorage.getItem("hazardousAsteroids"));
+            if (asteroids.length > this.pageSize) {
+                this.currentPageItems = asteroids.slice(0, this.pageSize);
+                document.getElementById('nextPageButton').disabled = false;
+                document.getElementById('previousPageButton').disabled = true;
+            } else {
+                this.currentPageItems = asteroids;
+                document.getElementById('nextPageButton').disabled = true;
+                document.getElementById('previousPageButton').disabled = true;
+            }
+
+            this.fillCurrentPageItems.call(this);
+        }
+    }, {
+        key: "fillCurrentPageItems",
+        value: function fillCurrentPageItems() {
+            var tableBody = document.getElementById('table-body');
+            this.clearTable.call(this);
+
+            // Create a new row for each hazardous asteroid
+            for (var i = 0; i < this.currentPageItems.length; i++) {
+
+                var tr = document.createElement("tr"); // Create table row
+
+                // Create all table cells and append them to table row, five in total
+                var date = document.createElement("td");
+                var dateText = document.createTextNode(this.currentPageItems[i].close_approach_data["0"].close_approach_date);
+                date.appendChild(dateText);
+                tr.appendChild(date);
+
+                var name = document.createElement("td");
+                var nameText = document.createTextNode(this.currentPageItems[i].name);
+                name.appendChild(nameText);
+                tr.appendChild(name);
+
+                var speed = document.createElement("td");
+                var speedText = document.createTextNode(this.currentPageItems[i].close_approach_data["0"].relative_velocity.kilometers_per_hour);
+                speed.appendChild(speedText);
+                tr.appendChild(speed);
+
+                var min = document.createElement("td");
+                var minText = document.createTextNode(this.currentPageItems[i].estimated_diameter.meters.estimated_diameter_min);
+                min.appendChild(minText);
+                tr.appendChild(min);
+
+                var max = document.createElement("td");
+                var maxText = document.createTextNode(this.currentPageItems[i].estimated_diameter.meters.estimated_diameter_max);
+                max.appendChild(maxText);
+                tr.appendChild(max);
+
+                // Append the whole row to the table
+                tableBody.appendChild(tr);
+            }
+        }
+    }, {
+        key: "clearTable",
+        value: function clearTable() {
+            var table = document.getElementById('table-body');
+            while (table.firstChild) {
+                table.removeChild(table.firstChild);
+            }
+        }
+    }, {
+        key: "navigateToNextPage",
+        value: function navigateToNextPage() {
+            var asteroids = JSON.parse(localStorage.getItem("hazardousAsteroids"));
+            var numberOfElementsToPlaceInNextPage = asteroids.length > this.currentPage * this.pageSize + this.pageSize ? this.pageSize : asteroids.length - this.currentPage * this.pageSize;
+
+            if (this.currentPageItems) {
+                this.previousPageItems = this.currentPageItems;
+            }
+            this.currentPage++;
+            this.currentPageItems = asteroids.slice(this.currentPage * this.pageSize, this.currentPage * this.pageSize + numberOfElementsToPlaceInNextPage);
+
+            if (asteroids.indexOf(this.currentPageItems[this.currentPageItems.length - 1]) == asteroids.length - 1) {
+                document.getElementById('nextPageButton').disabled = true;
+            }
+            document.getElementById('previousPageButton').disabled = false;
+
+            this.fillCurrentPageItems.call(this);
+        }
+    }, {
+        key: "navigateToPrevoiusPage",
+        value: function navigateToPrevoiusPage() {
+            var asteroids = JSON.parse(localStorage.getItem("hazardousAsteroids"));
+            this.currentPageItems = this.previousPageItems;
+            this.fillCurrentPageItems.call(this);
+            document.getElementById('nextPageButton').disabled = false;
+            this.currentPage--;
+
+            if (this.currentPage == 0) {
+                document.getElementById('previousPageButton').disabled = true;
+                this.previousPageItems = [];
+            } else {
+                this.previousPageItems = asteroids.slice((this.currentPage - 1) * this.pageSize, (this.currentPage - 1) * this.pageSize + this.pageSize);
             }
         }
     }]);

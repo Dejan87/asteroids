@@ -2,11 +2,11 @@ var path = require("path");
 
 module.exports = {
     entry: {
-        app: "./js/asteroid-data.js",
+        app: "./js/app.js",
     },
     output: {
         path: path.resolve(__dirname, "./js/app"),
-        filename: "asteroid-data.js" // [name] will keep the file name dynamic
+        filename: "app.js" // [name] will keep the file name dynamic
     },
     module: {
         loaders: [

@@ -36,6 +36,23 @@ h3 {
 .button:hover {
   background-color: #6B68A5; }
 
+button {
+  border: none;
+  display: inline-block;
+  color: #fff;
+  padding: 8px 20px;
+  background-color: #09046a;
+  cursor: pointer;
+  border-radius: 5px;
+  -webkit-transition: all 0.3s ease-in-out;
+  transition: all 0.3s ease-in-out; }
+
+button:hover {
+  background-color: #6B68A5; }
+
+button:focus {
+  outline: none; }
+
 .button--left-position {
   margin-top: 30px;
   position: relative;
