@@ -352,10 +352,15 @@ var AsteroidsTable = function () {
                 document.getElementById("asteroidList").value = "";
             }
 
+            var pageText = document.createTextNode("1");
+            var text = document.getElementById("pageNumber");
+            text.innerText = "";
+            text.appendChild(pageText);
+
             if (array.length > 10) {
                 this.initializeTable.call(this);
                 document.getElementById('nextPageButton').disabled = false;
-                document.getElementById('previousPageButton').disabled = false;
+                document.getElementById('previousPageButton').disabled = true;
             } else {
                 document.getElementById('nextPageButton').disabled = true;
                 document.getElementById('previousPageButton').disabled = true;
@@ -490,6 +495,12 @@ var AsteroidsTable = function () {
             document.getElementById('previousPageButton').disabled = false;
 
             this.fillCurrentPageItems.call(this);
+
+            var number = this.currentPage + 1;
+            var pageText = document.createTextNode("" + number);
+            var text = document.getElementById("pageNumber");
+            text.innerText = "";
+            text.appendChild(pageText);
         }
     }, {
         key: "navigateToPrevoiusPage",
@@ -506,6 +517,12 @@ var AsteroidsTable = function () {
             } else {
                 this.previousPageItems = asteroids.slice((this.currentPage - 1) * this.pageSize, (this.currentPage - 1) * this.pageSize + this.pageSize);
             }
+
+            var number = this.currentPage + 1;
+            var pageText = document.createTextNode("" + number);
+            var text = document.getElementById("pageNumber");
+            text.innerText = "";
+            text.appendChild(pageText);
         }
     }]);
 

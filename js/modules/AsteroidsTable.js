@@ -267,10 +267,15 @@ class AsteroidsTable {
             document.getElementById("asteroidList").value = "";
         }
 
+        let pageText = document.createTextNode("1");
+        let text = document.getElementById("pageNumber");
+        text.innerText = "";
+        text.appendChild(pageText);
+
         if(array.length > 10) {
             this.initializeTable.call(this);
             document.getElementById('nextPageButton').disabled = false;
-            document.getElementById('previousPageButton').disabled = false;
+            document.getElementById('previousPageButton').disabled = true;
         } else {
             document.getElementById('nextPageButton').disabled = true;
             document.getElementById('previousPageButton').disabled = true;
@@ -395,6 +400,12 @@ class AsteroidsTable {
         document.getElementById('previousPageButton').disabled = false;
         
         this.fillCurrentPageItems.call(this);
+
+        let number = this.currentPage + 1;
+        let pageText = document.createTextNode("" + number);
+        let text = document.getElementById("pageNumber");
+        text.innerText = "";
+        text.appendChild(pageText);
         
     }
 
@@ -411,6 +422,12 @@ class AsteroidsTable {
         } else {
             this.previousPageItems = asteroids.slice((this.currentPage - 1) * this.pageSize, (this.currentPage - 1) * this.pageSize + this.pageSize);
         }
+
+        let number = this.currentPage + 1;
+        let pageText = document.createTextNode("" + number);
+        let text = document.getElementById("pageNumber");
+        text.innerText = "";
+        text.appendChild(pageText);
     }
 }
 
