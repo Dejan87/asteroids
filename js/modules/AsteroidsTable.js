@@ -24,6 +24,10 @@ class AsteroidsTable {
         this.next.onclick = this.navigateToNextPage.bind(this);
         this.prev.onclick = this.navigateToPrevoiusPage.bind(this);
 
+        // Sorting references
+        document.getElementById("thSpeed").onclick = this.sortBySpeed.bind(this);
+        document.getElementById("thName").onclick = this.sortByName.bind(this);
+
         this.previousSearch(); // If there is data in local storage, use it
     }
 
@@ -227,7 +231,6 @@ class AsteroidsTable {
 
         // Create a new row for each hazardous asteroid
         for(let i = 0; i < array.length; i++) {
-
             let tr = document.createElement("tr"); // Create table row
 
             // Create all table cells and append them to table row, five in total
@@ -429,6 +432,84 @@ class AsteroidsTable {
         text.innerText = "";
         text.appendChild(pageText);
     }
+
+    /******************************************
+     *         SORTING LOGIC
+     *****************************************/
+    sortBySpeed() {
+        // Get the copy of hazardous asteroids from local storage
+        let array = JSON.parse(localStorage.getItem("hazardousAsteroids"));
+        let speedArray = [];
+        let updatedArray = [];
+
+        // Loop through all asteroids and get their speed values
+        for(let i = 0; i < array.length; i++) {
+            let number = +array[i].close_approach_data["0"].relative_velocity.kilometers_per_hour; // Turn each string into number
+            speedArray.push(number);
+        }
+
+        // Sort the speed Array from max to min speed
+        let sortedArray = this.sortMax.call(this, speedArray);
+
+        // Loop through sortedArray and sort elements by their speed
+        for(let j = 0; j < sortedArray.length; j++) {
+            let text = "" + sortedArray[j]; // Turn each number back to string value
+            
+            for(let k = 0; k < array.length; k++) {
+                // Find that asteriod object by checking its speed value
+                if(text === array[k].close_approach_data["0"].relative_velocity.kilometers_per_hour) {  
+                    updatedArray.push(array[k]); // push the asteroid object to udatedArray
+                }
+
+            }
+        }
+        localStorage.setItem("hazardousAsteroids", JSON.stringify(updatedArray)); // Update the localStorage
+
+        this.createTable.call(this, updatedArray); // Update the table
+    }
+
+    sortByName() {
+        // Get the copy of hazardous asteroids from local storage
+        let array = JSON.parse(localStorage.getItem("hazardousAsteroids"));
+        let nameArray = [];
+        let sortedNameArray = [];
+
+        // Loop through all asteroids and get their name values
+        for(let i = 0; i < array.length; i++) {
+            nameArray.push(array[i].name);
+        }
+
+        // Sort the name array
+        nameArray.sort();
+
+        for(let j = 0; j < nameArray.length; j++) {
+            
+            for(let k = 0; k < array.length; k++) {
+                // Find that asteriod object by checking its name
+                if(nameArray[j] === array[k].name) {
+                    sortedNameArray.push(array[k]); // push the asteroid object to sortedNameArray
+                }
+
+            }
+        }
+
+        localStorage.setItem("hazardousAsteroids", JSON.stringify(sortedNameArray)); // Update the localStorage
+
+        this.createTable.call(this, sortedNameArray); // Update the table
+
+    }
+
+    sortMax(array) {
+        array.sort(this.sortNumber.bind(this));
+
+        return array;
+    }
+
+    sortNumber(a,b) {
+        return b - a;
+    }
+
+
 }
 
 export default AsteroidsTable;

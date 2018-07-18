@@ -106,6 +106,10 @@ var AsteroidsTable = function () {
         this.next.onclick = this.navigateToNextPage.bind(this);
         this.prev.onclick = this.navigateToPrevoiusPage.bind(this);
 
+        // Sorting references
+        document.getElementById("thSpeed").onclick = this.sortBySpeed.bind(this);
+        document.getElementById("thName").onclick = this.sortByName.bind(this);
+
         this.previousSearch(); // If there is data in local storage, use it
     }
 
@@ -312,7 +316,6 @@ var AsteroidsTable = function () {
 
             // Create a new row for each hazardous asteroid
             for (var i = 0; i < array.length; i++) {
-
                 var tr = document.createElement("tr"); // Create table row
 
                 // Create all table cells and append them to table row, five in total
@@ -523,6 +526,85 @@ var AsteroidsTable = function () {
             var text = document.getElementById("pageNumber");
             text.innerText = "";
             text.appendChild(pageText);
+        }
+
+        /******************************************
+         *         SORTING LOGIC
+         *****************************************/
+
+    }, {
+        key: "sortBySpeed",
+        value: function sortBySpeed() {
+            // Get the copy of hazardous asteroids from local storage
+            var array = JSON.parse(localStorage.getItem("hazardousAsteroids"));
+            var speedArray = [];
+            var updatedArray = [];
+
+            // Loop through all asteroids and get their speed values
+            for (var i = 0; i < array.length; i++) {
+                var number = +array[i].close_approach_data["0"].relative_velocity.kilometers_per_hour; // Turn each string into number
+                speedArray.push(number);
+            }
+
+            // Sort the speed Array from max to min speed
+            var sortedArray = this.sortMax.call(this, speedArray);
+
+            // Loop through sortedArray and sort elements by their speed
+            for (var j = 0; j < sortedArray.length; j++) {
+                var text = "" + sortedArray[j]; // Turn each number back to string value
+
+                for (var k = 0; k < array.length; k++) {
+                    // Find that asteriod object by checking its speed value
+                    if (text === array[k].close_approach_data["0"].relative_velocity.kilometers_per_hour) {
+                        updatedArray.push(array[k]); // push the asteroid object to udatedArray
+                    }
+                }
+            }
+            localStorage.setItem("hazardousAsteroids", JSON.stringify(updatedArray)); // Update the localStorage
+
+            this.createTable.call(this, updatedArray); // Update the table
+        }
+    }, {
+        key: "sortByName",
+        value: function sortByName() {
+            // Get the copy of hazardous asteroids from local storage
+            var array = JSON.parse(localStorage.getItem("hazardousAsteroids"));
+            var nameArray = [];
+            var sortedNameArray = [];
+
+            // Loop through all asteroids and get their name values
+            for (var i = 0; i < array.length; i++) {
+                nameArray.push(array[i].name);
+            }
+
+            // Sort the name array
+            nameArray.sort();
+
+            for (var j = 0; j < nameArray.length; j++) {
+
+                for (var k = 0; k < array.length; k++) {
+                    // Find that asteriod object by checking its name
+                    if (nameArray[j] === array[k].name) {
+                        sortedNameArray.push(array[k]); // push the asteroid object to sortedNameArray
+                    }
+                }
+            }
+
+            localStorage.setItem("hazardousAsteroids", JSON.stringify(sortedNameArray)); // Update the localStorage
+
+            this.createTable.call(this, sortedNameArray); // Update the table
+        }
+    }, {
+        key: "sortMax",
+        value: function sortMax(array) {
+            array.sort(this.sortNumber.bind(this));
+
+            return array;
+        }
+    }, {
+        key: "sortNumber",
+        value: function sortNumber(a, b) {
+            return b - a;
         }
     }]);
 

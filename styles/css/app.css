@@ -132,7 +132,10 @@ header {
     .asteroids {
       width: 95%; } }
 
-.astroids__list {
+.table-head {
+  cursor: pointer; }
+
+.asteroids__list {
   margin-top: 50px;
   text-align: left;
   padding: 15px; }

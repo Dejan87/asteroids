@@ -44,11 +44,11 @@
             <table class="table table-striped table-dark">
                 <thead>
                     <tr>
-                    <th scope="col">Date</th>
-                    <th scope="col">Name</th>
-                    <th scope="col">Movement Speed (km/h)</th>
-                    <th scope="col">Min. Diameter (m)</th>
-                    <th scope="col">Max. Diameter (m)</th>
+                    <th id="thDate" class="table-head" scope="col" data-toggle="tooltip" data-placement="top" title="Sort by Date">Date</th>
+                    <th id="thName" class="table-head" scope="col" data-toggle="tooltip" data-placement="top" title="Sort by Name">Name</th>
+                    <th id="thSpeed" class="table-head" scope="col" data-toggle="tooltip" data-placement="top" title="Sort by Speed">Movement Speed (km/h)</th>
+                    <th id="thMin" class="table-head" scope="col" data-toggle="tooltip" data-placement="top" title="Sort by Diameter(min)">Min. Diameter (m)</th>
+                    <th id="thMax" class="table-head" scope="col" data-toggle="tooltip" data-placement="top" title="Sort by Diameter(max)">Max. Diameter (m)</th>
                     </tr>
                 </thead>
                 <tbody id="table-body">
@@ -61,7 +61,7 @@
                 <button id="nextPageButton">Next</button>
             </div>
         </div>
-        <div class="astroids__list">
+        <div class="asteroids__list">
             <div class="row">
                 <div class="col-md-7">
                     <p>Select one of the asteroids from the table<br> and press enter to add that asteroid to the list:</p>
