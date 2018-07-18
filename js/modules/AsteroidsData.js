@@ -3,21 +3,26 @@ class AsteroidsData {
         // Retrieve the hazardous asteroids array from the local storage
         this.asteroidArray = JSON.parse(localStorage.getItem("hazardousAsteroids"));
         // Retrieve the selected asteroid from the local storage
-        this.selectedAsteroid = localStorage.getItem("asteroid");
+        this.selectedAsteroids = JSON.parse(localStorage.getItem("asteroids"));
         
-        for(let i = 0; i < this.asteroidArray.length; i++) {
-            // Find the selected asteroid
-            if(this.asteroidArray[i].name === this.selectedAsteroid) {
-                // Fetch all close encounters from 1900 to 1999 for selected asteroid
-                this.fetchCloseEncounters(this.asteroidArray[i].links.self);
+        // Loop through all selected asteroids
+        for(let j = 0; j < this.selectedAsteroids.length; j++) {
+
+
+            for(let i = 0; i < this.asteroidArray.length; i++) {
+                // Find the selected asteroid and its data
+                if(this.asteroidArray[i].name === this.selectedAsteroids[j]) {
+                    // Fetch all close encounters from 1900 to 1999 for selected asteroid
+                    this.fetchCloseEncounters(this.asteroidArray[i].links.self, this.selectedAsteroids[j]);
+                }
+            
             }
-        
         }
 
         document.getElementById("goBack").onclick = this.goBack.bind(this);
     }
 
-    fetchCloseEncounters(url) {
+    fetchCloseEncounters(url, asteroidName) {
         let dataFrom1900To1999 = [];
     
         let xhr2 = new XMLHttpRequest();
@@ -52,7 +57,7 @@ class AsteroidsData {
                     let color = self.pickColor.call(self, numberOfCloseApproaches);
     
                     // Create the chart based on a number
-                    self.createChart.call(this, numberOfCloseApproaches, color);
+                    self.createChart.call(this, numberOfCloseApproaches, color, asteroidName);
                 } else {
                     console.log('Error: ' + xhr2.status); // An error occurred during the request.
                 }
@@ -76,26 +81,41 @@ class AsteroidsData {
         return color;
     }
 
-    createChart(closeApproaches, color) {
-        let span = document.getElementById("selectedAsteroid");
+    createChart(closeApproaches, color, asteroidName) {
+        // Save a reference to a chartName and chartAsteroid elements
+        let chartName = document.getElementById("chart__name");
+        let chartAsteroid = document.getElementById("chart__asteroid");
         
-        let asteroid = localStorage.getItem("asteroid");
+
+        let span = document.createElement("span");
+        span.setAttribute("class", "selectedAsteroid");
+        let nameText = document.createTextNode(asteroidName);
+        span.appendChild(nameText);
+        chartName.appendChild(span);
+        let br = document.createElement("br");
+        chartName.appendChild(br);
+
+        // Create div with the class "chart__asteroid"
+        let div = document.createElement("div");
+        div.setAttribute("class", "chart__asteroid");
     
-        if(asteroid && span) {
-            span.innerHTML = asteroid;
-        }
-    
-        let slider = document.getElementById("slider");
-        if(slider) {
-            if(closeApproaches <= 100) {
-                slider.style.width = "" + closeApproaches + "%";
-                slider.style.backgroundColor = color;
-                slider.innerHTML = "" + closeApproaches + "";
-            } else {
-                slider.style.width = "100%";
-                slider.style.backgroundColor = color;
-                slider.innerHTML = "" + closeApproaches + "";
-            }
+        // Create inner div with the class "chart__number", text with number of close approaches, append it to div
+        let innerDiv = document.createElement("div");
+        innerDiv.setAttribute("class", "chart__number");
+        div.appendChild(innerDiv);
+
+        // Append the final div to chartAsteroid element
+        chartAsteroid.appendChild(div);
+        
+        // Add width and background color
+        if(closeApproaches <= 100) {
+            innerDiv.style.width = "" + closeApproaches + "%";
+            innerDiv.style.backgroundColor = color;
+            innerDiv.innerHTML = "" + closeApproaches + "";
+        } else {
+            innerDiv.style.width = "100%";
+            innerDiv.style.backgroundColor = color;
+            innerDiv.innerHTML = "" + closeApproaches + "";
         }
     }
 

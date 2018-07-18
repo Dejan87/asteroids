@@ -274,19 +274,8 @@ class AsteroidsTable {
     }
 
     closeApproaches() {
-        let asteroid = this.asteroid.value;
-    
-        if(asteroid) {
-            localStorage.setItem("asteroid", asteroid); // Save the selected asteroid to local storage for future use
-    
-            this.asteroidsMessage.innerHTML = ""; // Clear existing data, if any
-            
-            window.location = "asteroids-data.html"; // Open new window
-        } else {
-            this.asteroidsMessage.innerHTML = ""; // Clear existing data, if any
-    
-            this.asteroidsMessage.innerHTML = "<p>Please choose one of the asteroids from the list.</p>";
-        }
+        // Redirect user to a new page
+        window.location = "asteroids-data.html";
     }
 
     /**

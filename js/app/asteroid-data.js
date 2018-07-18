@@ -100,13 +100,17 @@ var AsteroidsData = function () {
         // Retrieve the hazardous asteroids array from the local storage
         this.asteroidArray = JSON.parse(localStorage.getItem("hazardousAsteroids"));
         // Retrieve the selected asteroid from the local storage
-        this.selectedAsteroid = localStorage.getItem("asteroid");
+        this.selectedAsteroids = JSON.parse(localStorage.getItem("asteroids"));
 
-        for (var i = 0; i < this.asteroidArray.length; i++) {
-            // Find the selected asteroid
-            if (this.asteroidArray[i].name === this.selectedAsteroid) {
-                // Fetch all close encounters from 1900 to 1999 for selected asteroid
-                this.fetchCloseEncounters(this.asteroidArray[i].links.self);
+        // Loop through all selected asteroids
+        for (var j = 0; j < this.selectedAsteroids.length; j++) {
+
+            for (var i = 0; i < this.asteroidArray.length; i++) {
+                // Find the selected asteroid and its data
+                if (this.asteroidArray[i].name === this.selectedAsteroids[j]) {
+                    // Fetch all close encounters from 1900 to 1999 for selected asteroid
+                    this.fetchCloseEncounters(this.asteroidArray[i].links.self, this.selectedAsteroids[j]);
+                }
             }
         }
 
@@ -115,7 +119,7 @@ var AsteroidsData = function () {
 
     _createClass(AsteroidsData, [{
         key: "fetchCloseEncounters",
-        value: function fetchCloseEncounters(url) {
+        value: function fetchCloseEncounters(url, asteroidName) {
             var dataFrom1900To1999 = [];
 
             var xhr2 = new XMLHttpRequest();
@@ -150,7 +154,7 @@ var AsteroidsData = function () {
                         var color = self.pickColor.call(self, numberOfCloseApproaches);
 
                         // Create the chart based on a number
-                        self.createChart.call(this, numberOfCloseApproaches, color);
+                        self.createChart.call(this, numberOfCloseApproaches, color, asteroidName);
                     } else {
                         console.log('Error: ' + xhr2.status); // An error occurred during the request.
                     }
@@ -176,26 +180,40 @@ var AsteroidsData = function () {
         }
     }, {
         key: "createChart",
-        value: function createChart(closeApproaches, color) {
-            var span = document.getElementById("selectedAsteroid");
+        value: function createChart(closeApproaches, color, asteroidName) {
+            // Save a reference to a chartName and chartAsteroid elements
+            var chartName = document.getElementById("chart__name");
+            var chartAsteroid = document.getElementById("chart__asteroid");
 
-            var asteroid = localStorage.getItem("asteroid");
+            var span = document.createElement("span");
+            span.setAttribute("class", "selectedAsteroid");
+            var nameText = document.createTextNode(asteroidName);
+            span.appendChild(nameText);
+            chartName.appendChild(span);
+            var br = document.createElement("br");
+            chartName.appendChild(br);
 
-            if (asteroid && span) {
-                span.innerHTML = asteroid;
-            }
+            // Create div with the class "chart__asteroid"
+            var div = document.createElement("div");
+            div.setAttribute("class", "chart__asteroid");
 
-            var slider = document.getElementById("slider");
-            if (slider) {
-                if (closeApproaches <= 100) {
-                    slider.style.width = "" + closeApproaches + "%";
-                    slider.style.backgroundColor = color;
-                    slider.innerHTML = "" + closeApproaches + "";
-                } else {
-                    slider.style.width = "100%";
-                    slider.style.backgroundColor = color;
-                    slider.innerHTML = "" + closeApproaches + "";
-                }
+            // Create inner div with the class "chart__number", text with number of close approaches, append it to div
+            var innerDiv = document.createElement("div");
+            innerDiv.setAttribute("class", "chart__number");
+            div.appendChild(innerDiv);
+
+            // Append the final div to chartAsteroid element
+            chartAsteroid.appendChild(div);
+
+            // Add width and background color
+            if (closeApproaches <= 100) {
+                innerDiv.style.width = "" + closeApproaches + "%";
+                innerDiv.style.backgroundColor = color;
+                innerDiv.innerHTML = "" + closeApproaches + "";
+            } else {
+                innerDiv.style.width = "100%";
+                innerDiv.style.backgroundColor = color;
+                innerDiv.innerHTML = "" + closeApproaches + "";
             }
         }
     }, {
